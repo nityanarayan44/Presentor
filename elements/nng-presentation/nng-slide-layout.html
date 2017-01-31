@@ -1,0 +1,227 @@
+<!--
+@Author: Nitya Narayan Gautam
+@Date: 31-JAN-2017
+@Desc: slide presentation element.
+-->
+
+<!-- IMPORT -->
+        <script src="../../bower_components/webcomponentsjs/webcomponents-lite.js"></script>
+
+        <link rel="import" href="../../bower_components/polymer/polymer.html">
+        <link rel="import" href="../../bower_components/font-roboto/roboto.html">
+        <link rel="import" href="../../bower_components/iron-icons/iron-icons.html">
+        <link rel="import" href="../../bower_components/iron-icons/social-icons.html">
+        <link rel="import" href="../../bower_components/iron-icons/communication-icons.html">
+        <link rel="import" href="../../bower_components/iron-icons/notification-icons.html">
+        <link rel="import" href="../../bower_components/iron-pages/iron-pages.html">
+        <link rel="import" href="../../bower_components/iron-ajax/iron-ajax.html">
+        <link rel="import" href="../../bower_components/paper-toast/paper-toast.html">
+        <link rel="import" href="../../bower_components/paper-material/paper-material.html">
+        <link rel="import" href="../../bower_components/paper-progress/paper-progress.html">
+
+<!-- Element Definition -->
+<dom-module id="nng-slide-layout">
+        <template>
+
+                <!-- element style -->
+                        <style is="custom-style">
+
+                                body {
+                                        margin: 0;
+                                        font-family: 'Roboto', 'Noto', sans-serif;
+                                        background-color: #ccc;
+                                }
+
+                                app-header {
+                                        background-color: var(--google-red-500);
+                                        /*background-color: var(#4285f4);*/
+                                        color: #fff;
+                                }
+
+                                app-drawer-layout {
+                                        --app-drawer-layout-content-transition: margin 0.5s;
+                                        overflow: hidden;
+                                        overflow-y: visible;
+                                }
+
+                                iron-pages {
+                                        overflow: hidden;
+                                        word-wrap: break-word;
+                                        /*text-align: center;*/
+                                }
+                                .slides{
+                                        background-color: var(--paper-cyan-500);
+                                        position: fixed;
+                                        left: 0; right: 0;
+                                        top: 0; bottom: 0;
+                                        margin: 3px;
+                                        padding-left: 20px;
+                                        padding-right: 20px;
+                                }
+                                div.title {
+                                        font-size: 4rem;
+                                        font-weight: 400;
+                                }
+                                div.subtitle {
+                                        font-size: 2rem;
+                                        font-weight: 300;
+                                        line-height: 10%;
+                                }
+                                div.subtitle, div.title {
+                                        padding:20px;
+                                        text-align: center;
+                                        position: relative;
+                                }
+                                div.topic{
+                                        font-size: 1rem;
+                                        font-weight: normal;
+                                }
+                        </style>
+
+                <!-- Elements -->
+                        <!-- Application main-workspace -->
+
+                                <!-- Setting up iron-ajax-call-->
+                                <iron-ajax
+                                        id="ajax"
+                                        url="http://localhost:8000/presentation.json"
+                                        handle-as="json"
+                                        method="GET"
+                                        on-response="_onResponse"
+                                        on-error="_onError"
+                                        timeout="60000">
+                                </iron-ajax>
+
+                                <!-- Rendering slides. -->
+                                <iron-pages id="pages" selected="0">
+                                        <template is="dom-repeat" items="{{data}}" as="slide" index-as="i">
+
+                                                <!-- Each slide/page-->
+                                                <paper-material elevation='2' class="slides" on-click="slideClicked">
+                                                        <div class="title"> [[slide.title]] </div>
+                                                        <div class="subtitle"> [[slide.subtitle]] </div>
+                                                        <!-- if topics exist then -->
+                                                        <template is="dom-if" if="{{_isTopicAvailable(slide)}}">
+                                                                <paper-progress class="prgbar"></paper-progress>
+                                                                <div class="alltopics">
+                                                                        <template is="dom-repeat" items="[[slide.topics]]" as="topics" index-as="j">
+                                                                                TOPICS: <span class="topic"> [[topics]] </span><br/>
+                                                                        </template>
+                                                                </div>
+                                                        </template>
+                                                </paper-material>
+
+                                        </template>
+                                        <!--<paper-material elevation='1' class="demoCard" on-click="slideClicked"> 5 </paper-material> -->
+                                </iron-pages>
+
+                        <!-- Slide Controls -->
+                                <div id="control"></div>
+                        <!-- Toaster Notification -->
+                                <paper-toast id="toast" text="WELCOME TO THIS PRESENTATION."></paper-toast>
+        </template>
+        <script>
+
+                (function() {
+                        'use strict';
+
+                        Polymer({
+                        /*
+                        ------------------------------------------------------------------
+                        Registering dom-element with name 'nng-connect-layout'.
+                        ------------------------------------------------------------------
+                        */
+                                is: 'nng-slide-layout',
+
+                        /*
+                        ------------------------------------------------------------------
+                        user defined properties of dom-element.
+                        ------------------------------------------------------------------
+                        */
+                                properties: {
+                                        title:{ type: String, value: 'CONNECT' },
+                                        data:{
+                                                type: Array,
+                                                value: function(){
+                                                        return [
+                                                                {
+                                                                        title:"slide1-t1",
+                                                                        subtitle:"slide1-st1",
+                                                                        topics:[
+                                                                                "slide1-1",
+                                                                                "slide1-2",
+                                                                                "slide1-3"
+                                                                        ]
+                                                                },
+                                                                {
+                                                                        title:"slide2-t2",
+                                                                        subtitle:"slide2-st2",
+                                                                        topics:[
+                                                                                "slide2-1",
+                                                                                "slide2-2",
+                                                                                "slide2-3"
+                                                                        ]
+                                                                }
+                                                        ];
+                                                },
+                                                notify: true
+                                        }
+                                },
+
+                        /*
+                        ------------------------------------------------------------------
+                        attaching listeners for dom-element.
+                        ------------------------------------------------------------------
+                        */
+                                //listeners: {'on-slide-click': 'collectSlideChangeEvent'},
+
+                        /*
+                        ------------------------------------------------------------------
+                         functions for element nevigation using iron pages.
+                        ------------------------------------------------------------------
+                        */
+                                slideClicked: function(){
+                                        this.$.pages.selectNext();
+                                        //this.$.pages.selectPrevious();
+                                },
+                        /*
+                        ------------------------------------------------------------------
+                        User defined functions for element.
+                        ------------------------------------------------------------------
+                        */
+                                _isTopicAvailable: function(){
+                                        return true;
+                                },
+                                /* On Msg arrival, when a new post/message arrived */
+                                _msgObjectChanged: function(){
+                                                if(this.msgDataObj.status && this.msgDataObj.time){
+                                                        console.info(' Message Object changed...');
+                                                        console.dir(this.msgDataObj);
+                                                }else{ /* MSG Object is empty... */ }
+                                },
+                                /* Ajax functions */
+                                _onResponse: function(){
+
+                                },
+                                _onError: function(){
+
+                                },
+                                _requestForData: function(){
+
+                                },
+
+                        /*
+                        ------------------------------------------------------------------
+                        dom-element event.
+                        ------------------------------------------------------------------
+                        */
+                                attached: function(){ console.log("nng-slide-layout attached."); },
+
+                                ready: function(){
+                                        //Toaster open.
+                                        this.$.toast.show();
+                                }
+                        });
+                })();
+
+        </script>

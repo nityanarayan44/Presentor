@@ -1,0 +1,56 @@
+<!doctype html>
+<!--
+@license
+Copyright (c) 2015 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+-->
+
+<html lang="en">
+
+<head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
+        <title> Presentation </title>
+        <!-- build:js bower_components/webcomponentsjs/webcomponents-lite.min.js -->
+        <script src="bower_components/webcomponentsjs/webcomponents-lite.js"></script>
+        <!-- endbuild -->
+
+        <!-- Because this project uses vulcanize this should be your only html import
+        in this file. All other imports should go in elements.html -->
+        <link rel="import" href="elements/elements.html">
+
+        <!-- For shared styles, shared-styles.html import in elements.html -->
+        <style is="custom-style" include="shared-styles">
+                body {
+                  margin: 0;
+                  font-family: 'Roboto', 'Noto', sans-serif;
+                  background-color: #FFF;
+                }
+        </style>
+</head>
+
+        <body unresolved>
+                <div id="main-workspace">
+                        <!-- Authentication Layer -->
+                        <nng-auth id="authentication"></nng-auth>
+                </div>
+
+                <!-- //TODO: make another script file. -->
+                <script>
+                        //#AUTHENTICATION
+                                //When auth passed.
+                                document.getElementById('authentication').addEventListener('authPassed', function(data){
+                                        document.getElementById('main-workspace').innerHTML = '<nng-slide-layout></nng-slide-layout>';
+                                });
+                                //When auth failed.
+                                document.getElementById('authentication').addEventListener('authFailed', function(data){
+                                        document.getElementById('main-workspace').innerHTML = 'AUTHENTICATION FAILED !!!';
+                                });
+                </script>
+        </body>
+
+</html>

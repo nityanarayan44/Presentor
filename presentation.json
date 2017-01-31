@@ -1,0 +1,20 @@
+[
+	{
+		title:"slide1-title",
+		subtitle:"slide1-subtitle",
+		topics:[
+			"S1one",
+			"S1two",
+			"S1three"
+		]
+	},
+	{
+		title:"slide2-title",
+		subtitle:"slide2-subtitle",
+		topics:[
+			"S2one",
+			"S2two",
+			"S2three"
+		]
+	}
+]
